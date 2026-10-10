@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BookModule } from 'src/book/book.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { PersonModule } from 'src/person/person.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       synchronize: true // sincroniza com o banco de dados.
 
     }),
-    BookModule
+    BookModule,
+    PersonModule,
   ],
   controllers: [AppController],
   providers: [AppService],
