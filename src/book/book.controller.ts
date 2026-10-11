@@ -1,16 +1,18 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UsePipes } from '@nestjs/common';
 import { BookService } from './book.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ParseIntIdPipe } from 'src/common/pipes/parse-int-id.pipe';
 
 @Controller('book')
+@UsePipes(ParseIntIdPipe)
 export class BookController {
 
     constructor( private readonly bookService: BookService ) {}
 
     @Get(':id')
-    FindOne(@Param('id', ParseIntPipe) id: number) {
+    FindOne(@Param('id') id: number) {
         return this.bookService.findOne(id);
     }   
 
@@ -27,12 +29,12 @@ export class BookController {
     }
 
     @Put(':id')
-    update(@Param('id', ParseIntPipe) id: number, @Body()updateBookDto: UpdateBookDto) {
+    update(@Param('id') id: number, @Body()updateBookDto: UpdateBookDto) {
         return this.bookService.update(id, updateBookDto)
     }
 
     @Delete(':id')
-    remove(@Param('id', ParseIntPipe) id: number) {
+    remove(@Param('id') id: number) {
         return this.bookService.remove(id)
     }
 }
