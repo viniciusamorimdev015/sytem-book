@@ -1,5 +1,6 @@
 import { IsEmail } from "class-validator";
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BookEntity } from "src/book/entities/book.entity";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('person')
 export class Person {
@@ -18,6 +19,9 @@ export class Person {
         length: 100
     })
     name: string;
+
+    @OneToMany(() => BookEntity, (book) => book.person)
+    books: BookEntity[]
 
     @CreateDateColumn()
     createdAt?: Date;

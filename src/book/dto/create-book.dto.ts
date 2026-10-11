@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsInt, IsNotEmpty, IsPositive, IsString } from "class-validator";
 
  export class CreateBookDto {
 
@@ -19,4 +19,8 @@ import { IsNotEmpty, IsString } from "class-validator";
 
     @IsString()
     readonly status: string;
+
+    @IsInt()
+    @IsPositive()
+    readonly personId: number;
  }

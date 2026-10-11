@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Person } from "src/person/entities/person.entity";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('book')
 export class BookEntity {
@@ -20,6 +21,10 @@ export class BookEntity {
 
     @Column()
     status: string;
+
+    @ManyToOne(() => Person, (person) => person.books, {onDelete: 'CASCADE'})
+    @JoinColumn({ name: 'personId' })
+    person: Person;
 
     @CreateDateColumn()
     createdAt?: Date
