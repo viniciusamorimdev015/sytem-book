@@ -18,9 +18,6 @@ export class ParseIntIdPipe implements PipeTransform {
              throw new BadRequestException('ParseIntPipe espera uma numero maior que zero')
         }
         
-
-        console.log('PIPE Value', value)
-        console.log('PIPE Metadata', metadata)
         return parsedValue
     }
 }
