@@ -7,18 +7,20 @@ import { PersonModule } from 'src/person/person.module';
 import { APP_GUARD } from '@nestjs/core';
 import { IsAdmGuard } from 'src/common/guards/is-adm.guard';
 import { simpleMiddleware } from 'src/common/middleware/simplemiddleware.middleware';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      database: 'postgres',
-      password: '12345',
-      autoLoadEntities: true, // Carrega entidades sem vc precisa especifica-las
-      synchronize: true // sincroniza com o banco de dados.
+      type: process.env.DATABASE_TYPE as 'postgres',
+      host: process.env.DATABASE_HOST,
+      port: Number(process.env.DATABASE_PORT),
+      username: process.env.DATABASE_USERNAME,
+      database: process.env.DATABASE_DATABASE,
+      password:process.env.DATABASE_PASSWORD,
+      autoLoadEntities: Boolean(process.env.DATABASE_AUTOLOADENTITIES), // Carrega entidades sem vc precisa especifica-las
+      synchronize: Boolean(process.env.DATABASE_SYNCHRONIZE) // sincroniza com o banco de dados.
 
     }),
     BookModule,
