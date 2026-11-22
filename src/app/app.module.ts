@@ -7,51 +7,42 @@ import { PersonModule } from 'src/person/person.module';
 import { APP_GUARD } from '@nestjs/core';
 import { IsAdmGuard } from 'src/common/guards/is-adm.guard';
 import { simpleMiddleware } from 'src/common/middleware/simplemiddleware.middleware';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigType } from '@nestjs/config';
 
 import appConfig from './app.config';
 
 import * as Joi from 'joi'
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      load: [appConfig],
-      validationSchema: Joi.object({
-        DATABASE_TYPE: Joi.string().valid('postgres').required(),
-        DATABASE_HOST: Joi.string().required(),
-        DATABASE_PORT: Joi.number().required(),
-        DATABASE_USERNAME: Joi.string().required(),
-        DATABASE_DATABASE: Joi.string().required(),
-        DATABASE_PASSWORD: Joi.string().required(),
-        DATABASE_AUTOLOADENTITIES: Joi.boolean().required(),
-        DATABASE_SYNCHRONIZE: Joi.boolean().required(),
-      }), 
-    }),
+    ConfigModule.forRoot(),
+    ConfigModule.forFeature(appConfig),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: configService.get<'postgres'>('database.type'),
-        host: configService.get<string>('database.host'),
-        port: configService.get<number>('database.port'),
-        username: configService.get<string>('database.username'),
-        database: configService.get<string>('database.database'),
-        password: configService.get<string>('database.password'),
-        autoLoadEntities: configService.get<boolean>('database.autoLoadEntities'), // Carrega entidades sem vc precisa especifica-las
-        synchronize: configService.get<boolean>('database.synchronize'), // sincroniza com o banco de dados.
+      imports: [ConfigModule.forFeature(appConfig)],
+      inject: [appConfig.KEY],
+      useFactory: (appConfigurations: ConfigType<typeof appConfig>) => ({
+        type: appConfigurations.database.type,
+        host: appConfigurations.database.host,
+        port: appConfigurations.database.port,
+        username: appConfigurations.database.username,
+        database: appConfigurations.database.database,
+        password: appConfigurations.database.password,
+        autoLoadEntities: appConfigurations.database.autoLoadEntities, // Carrega entidades sem vc precisa especifica-las
+        synchronize: appConfigurations.database.synchronize, // sincroniza com o banco de dados.
       }),
     }),
     BookModule,
     PersonModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: IsAdmGuard
-    }
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: IsAdmGuard
+    // }
   ],
 })
 export class AppModule implements NestModule {
