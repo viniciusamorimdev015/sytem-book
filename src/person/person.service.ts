@@ -1,10 +1,11 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable } from '@nestjs/common';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Person } from './entities/person.entity';
 import { QueryFailedError, Repository } from 'typeorm';
 import { HashingService } from 'src/auth/hashing/hashing.service';
+import { TokenPayloadDto } from 'src/auth/dto/token-payload.dot';
 
 @Injectable()
 export class PersonService {
@@ -61,7 +62,7 @@ export class PersonService {
   }
 
   //ATUALIZAR DADOS DE UMA PESSOA
-  async update(id: number, updatePersonDto: UpdatePersonDto) {
+  async update(id: number, updatePersonDto: UpdatePersonDto, tokenPayload: TokenPayloadDto) {
 
     const personData = {
       name: updatePersonDto.name,
@@ -83,17 +84,25 @@ export class PersonService {
       throw new BadRequestException(`Pessoa com o ID ${id} não encontrada`)
     }
 
+    if(person.id !== tokenPayload.sub) {
+      throw new ForbiddenException('Voçê não é essa pessoa!')
+    }
+
     return this.personRepository.save(person)
   }
 
   //DELETAR UMA PESSOA
-  async remove(id: number) {
+  async remove(id: number, tokenPayload :TokenPayloadDto) {
     const person = await this.personRepository.findOneBy({
       id,
     });
 
     if(!person) {
       throw new BadRequestException(`Pessoa com o ID ${id} não encontrada`)
+    }
+
+    if(person.id !== tokenPayload.sub) {
+      throw new ForbiddenException('Voçê não é essa pessoa!')
     }
 
     return this.personRepository.remove(person)
